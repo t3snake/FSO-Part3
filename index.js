@@ -1,7 +1,13 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
+morgan.token('body', function getResponse (req, res) {
+    return JSON.stringify(req.body)
+})
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 const generateId = () => {
     let newId = Math.ceil(Math.random() * 10000)
@@ -80,7 +86,6 @@ app.post('/api/persons', (request, response) => {
     }
 
     const personSearch = persons.find(person => personData.name === person.name)
-    console.log(personSearch)
 
     if (personSearch){
         let errorResponse = {
