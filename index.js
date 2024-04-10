@@ -3,6 +3,18 @@ const app = express()
 
 app.use(express.json())
 
+const generateId = () => {
+    let newId = Math.ceil(Math.random() * 10000)
+
+    let person = persons.find(person => newId === person.id)
+
+    if (person) {
+        return generateId()
+    }
+
+    return newId
+}
+
 let persons = [
     { 
       "id": 1,
@@ -46,6 +58,21 @@ app.get('/info', (request, response) => {
     <p> Phonebook has info for ${persons.length} people </p>
     <p> ${new Date().toString()} </p>
     `)
+})
+
+app.post('/api/persons', (request, response) => {
+    let personData = request.body
+
+    let newPerson = {
+        id: generateId(),
+        name: personData.name,
+        number: personData.number
+    }
+
+    persons = persons.concat(newPerson)
+
+    response.json(newPerson)
+
 })
 
 app.delete('/api/persons/:id', (request, response) => {
