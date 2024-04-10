@@ -63,6 +63,33 @@ app.get('/info', (request, response) => {
 app.post('/api/persons', (request, response) => {
     let personData = request.body
 
+    if (!personData.name) {
+        let errorResponse = {
+            error: "Name is missing"
+        }
+        response.status(400).json(errorResponse)
+        return
+    }
+
+    if (!personData.number) {
+        let errorResponse = {
+            error: "Number is missing"
+        }
+        response.status(400).json(errorResponse)
+        return
+    }
+
+    const personSearch = persons.find(person => personData.name === person.name)
+    console.log(personSearch)
+
+    if (personSearch){
+        let errorResponse = {
+            error: `${personData.name} already exists in phonebook`
+        }
+        response.status(400).json(errorResponse)
+        return
+    }
+
     let newPerson = {
         id: generateId(),
         name: personData.name,
