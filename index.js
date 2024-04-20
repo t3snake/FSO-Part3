@@ -57,14 +57,17 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => id === person.id)
+    const id = request.params.id
 
-    if (!person){
-        response.status(404).end()
-    } else {
-        response.json(person)
-    }
+    Person.findById(id).then(result => {
+        response.json(result)
+    })
+
+    // if (!person){
+    //     response.status(404).end()
+    // } else {
+    //     response.json(person)
+    // }
 })
 
 app.get('/info', (request, response) => {
@@ -93,26 +96,24 @@ app.post('/api/persons', (request, response) => {
         return
     }
 
-    const personSearch = persons.find(person => personData.name === person.name)
+    // const personSearch = persons.find(person => personData.name === person.name)
 
-    if (personSearch){
-        let errorResponse = {
-            error: `${personData.name} already exists in phonebook`
-        }
-        response.status(400).json(errorResponse)
-        return
-    }
+    // if (personSearch){
+    //     let errorResponse = {
+    //         error: `${personData.name} already exists in phonebook`
+    //     }
+    //     response.status(400).json(errorResponse)
+    //     return
+    // }
 
-    let newPerson = {
-        id: generateId(),
+    let newPerson = new Person({
         name: personData.name,
-        number: personData.number
-    }
+        number: personData.number,
+    })
 
-    persons = persons.concat(newPerson)
-
-    response.json(newPerson)
-
+    newPerson.save().then(result => {
+        response.json(result)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
