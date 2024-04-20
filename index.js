@@ -37,11 +37,17 @@ app.get('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
-    response.send(`
-    <p> Phonebook has info for ${persons.length} people </p>
-    <p> ${new Date().toString()} </p>
-    `)
+app.get('/info', (request, response, next) => {
+    Person
+    .countDocuments({})
+    .then( (count) => {
+        response.send(`
+        <p> Phonebook has info for ${count} people </p>
+        <p> ${new Date().toString()} </p>
+        `)
+    })
+    .catch( (error) => next(error))
+    
 })
 
 app.post('/api/persons', (request, response, next) => {
@@ -63,32 +69,50 @@ app.post('/api/persons', (request, response, next) => {
         return
     }
 
-    // const personSearch = persons.find(person => personData.name === person.name)
-
-    // if (personSearch){
-    //     let errorResponse = {
-    //         error: `${personData.name} already exists in phonebook`
-    //     }
-    //     response.status(400).json(errorResponse)
-    //     return
-    // }
-
-    let newPerson = new Person({
-        name: personData.name,
-        number: personData.number,
-    })
-
-    newPerson.save()
+    Person.find({name: personData.name})
     .then(result => {
-        response.json(result)
+        if(result) {
+            let errorResponse = {
+                error: `${personData.name} already exists in phonebook`
+            }
+            response.status(400).json(errorResponse)
+            return
+        } else {
+            let newPerson = new Person({
+                name: personData.name,
+                number: personData.number,
+            })
+        
+            newPerson.save()
+            .then(result => {
+                response.json(result)
+            })
+            .catch(error => next(error))
+        }
     })
     .catch(error => next(error))
+})
 
+app.put('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+
+    const body = request.body
+    const updatedPerson = {
+        name: body.name,
+        number: body.number,
+    }
+
+    Person.findByIdAndUpdate(id, updatedPerson, {new: true})
+    .then(result => {
+        response.status(200).json(result)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
-    Person.findByIdAndDelete(id)
+    
+    Person.findByIdAndDelete(id, updatedPerson)
     .then(result => {
         response.status(204).end()
     })
