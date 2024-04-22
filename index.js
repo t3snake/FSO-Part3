@@ -53,23 +53,6 @@ app.get('/info', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     let personData = request.body
 
-    // Moved to MongoDB Validation
-    // if (!personData.name) {
-    //     let errorResponse = {
-    //         error: "Name is missing"
-    //     }
-    //     response.status(400).json(errorResponse)
-    //     return
-    // }
-
-    if (!personData.number) {
-        let errorResponse = {
-            error: "Number is missing"
-        }
-        response.status(400).json(errorResponse)
-        return
-    }
-
     Person.find({name: personData.name})
     .then(result => {
         if(result.length > 0) {
