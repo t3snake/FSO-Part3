@@ -53,13 +53,14 @@ app.get('/info', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
     let personData = request.body
 
-    if (!personData.name) {
-        let errorResponse = {
-            error: "Name is missing"
-        }
-        response.status(400).json(errorResponse)
-        return
-    }
+    // Moved to MongoDB Validation
+    // if (!personData.name) {
+    //     let errorResponse = {
+    //         error: "Name is missing"
+    //     }
+    //     response.status(400).json(errorResponse)
+    //     return
+    // }
 
     if (!personData.number) {
         let errorResponse = {
@@ -103,7 +104,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: body.number,
     }
 
-    Person.findByIdAndUpdate(id, updatedPerson, {new: true})
+    Person.findByIdAndUpdate(id, updatedPerson, {runValidators: true, new: true})
     .then(result => {
         response.status(200).json(result)
     })
@@ -124,8 +125,11 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
   
     if (error.name === 'CastError') {
-      return response.status(400).send({ error: 'malformatted id' })
+        return response.status(400).send({ error: 'malformatted id' })
     } 
+    if (error.name === 'ValidationError') {
+        return response.status(400).send({error: error.message})
+    }
   
     next(error)
 }
