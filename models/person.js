@@ -19,9 +19,22 @@ const personSchema = new mongoose.Schema({
     name: {
         type: String,
         minLength: 3,
-        required: true,
+        required: [true, "User name required"]
     },
-    number: String,
+    number: {
+        type: String,
+        minLength: 8,
+        validate: {
+            validator: (value) => {
+                const subArray = value.split("-")
+                if (subArray.length !== 2) return false
+                if (subArray[0].length < 2 || subArray[0].length > 3) return false
+                return true
+            },
+            message: "User phone number invalid"
+        },
+        required: [true, "User phone number required"]
+    }
 })
 
 personSchema.set('toJSON', {
