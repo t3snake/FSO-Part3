@@ -71,7 +71,8 @@ app.post('/api/persons', (request, response, next) => {
 
     Person.find({name: personData.name})
     .then(result => {
-        if(result) {
+        if(result.length > 0) {
+            console.log(result)
             let errorResponse = {
                 error: `${personData.name} already exists in phonebook`
             }
